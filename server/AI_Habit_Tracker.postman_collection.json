@@ -1,0 +1,312 @@
+{
+  "info": {
+    "name": "AI Habit Tracker API",
+    "description": "Complete API collection for the AI Habit Tracker backend. Set the `token` variable after logging in.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "ai-habit-tracker-v1"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Rivera\",\n  \"email\": \"alex@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('token', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/auth/me"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/auth/profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Rivera\",\n  \"morningMotivation\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Habits",
+      "item": [
+        {
+          "name": "Get All Habits",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/habits",
+              "query": [{ "key": "includeArchived", "value": "false" }]
+            }
+          }
+        },
+        {
+          "name": "Get All Habits (Including Archived)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/habits?includeArchived=true",
+              "query": [{ "key": "includeArchived", "value": "true" }]
+            }
+          }
+        },
+        {
+          "name": "Create Habit",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Drink 2L of water\",\n  \"description\": \"Stay hydrated throughout the day.\",\n  \"category\": \"Health\",\n  \"frequency\": \"daily\",\n  \"targetDays\": 7,\n  \"color\": \"#0ea5e9\",\n  \"icon\": \"💧\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Habit By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/habits/HABIT_ID_HERE"
+          }
+        },
+        {
+          "name": "Update Habit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/habits/HABIT_ID_HERE",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Drink 3L of water\",\n  \"targetDays\": 7\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Habit",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/habits/HABIT_ID_HERE"
+          }
+        },
+        {
+          "name": "Toggle Archive",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/habits/HABIT_ID_HERE/archive"
+          }
+        },
+        {
+          "name": "Reorder Habits",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/habits/reorder",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": [\n    { \"_id\": \"HABIT_ID_1\", \"order\": 0 },\n    { \"_id\": \"HABIT_ID_2\", \"order\": 1 }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "item": [
+        {
+          "name": "Mark Habit Done",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/logs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habitId\": \"HABIT_ID_HERE\",\n  \"date\": \"2026-06-16\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Unmark Habit",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/logs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habitId\": \"HABIT_ID_HERE\",\n  \"date\": \"2026-06-16\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Today's Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/logs/today"
+          }
+        },
+        {
+          "name": "Get Range Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/logs/range?start=2026-06-01&end=2026-06-16",
+              "query": [
+                { "key": "start", "value": "2026-06-01" },
+                { "key": "end", "value": "2026-06-16" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Heatmap (90 days)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/logs/heatmap"
+          }
+        },
+        {
+          "name": "Get Stats (30 days)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/logs/stats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Weekly Report",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/ai/weekly-report"
+          }
+        },
+        {
+          "name": "Suggest Habits",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/ai/suggest-habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goals\": \"Get fitter, read more, reduce phone time\",\n  \"productiveTime\": \"Early morning before 8am\",\n  \"struggles\": \"Gym in the morning, journaling at night\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Recovery Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/ai/recovery-plan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habitId\": \"HABIT_ID_HERE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "AI Chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/ai/chat",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Which day of the week am I most consistent?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Morning Motivation",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/ai/morning"
+          }
+        }
+      ]
+    }
+  ]
+}
